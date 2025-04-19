@@ -4,7 +4,7 @@ var siteUrl = document.getElementById("siteUrl");
 var webContainer = document.getElementById("webContainer");
 var collectionHTML = document.getElementsByClassName("DeleteRow");
 var regexName = /^[A-Z][a-z]{3,}$/;
-var regexURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+var regexURL = /^(https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
 
 
 
@@ -15,34 +15,36 @@ var regexURL = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9(
 //variables
 var userwebsites =JSON.parse(localStorage.getItem("website")) || [];
 displayAllwebsite()
+dltRow()
 //functions
 function submitINfo(){
     if(validData(regexURL,siteUrl)&&validData(regexName,siteName)){
-    var websiteInfo ={
-        websiteName : siteName.value,
-        websiteUrl : siteUrl.value,
-    };
-    userwebsites.push(websiteInfo);
-    localStorage.setItem("website", JSON.stringify(userwebsites))
-    displayWebInfo(userwebsites.length-1);
-    // for(var i=0; i<collectionHTML.length; i++){
-    //     console.log(collectionHTML.item(i))
-    //     collectionHTML.item(i).addEventListener("click", function(e){
-    //         console.log("clicked");
-    //         console.log(e.target);
-    //         var clickedbtn = e.target;
-    //         clickedbtn.parentElement.parentElement.remove();
-    //     })
-    // }
-    clearInput();  
+        if(!siteUrl.value.includes("https://")){
+            console.log(siteUrl.value);
+            var newUrl ="https://".concat(siteUrl.value);
+            console.log(newUrl);
+            var websiteInfo ={
+                websiteName : siteName.value,
+                websiteUrl : newUrl,
+        }
+        }else if(siteUrl.value.includes("https://")){
+            var websiteInfo ={
+                websiteName : siteName.value,
+                websiteUrl : siteUrl.value,  
+        }
+     } 
+     userwebsites.push(websiteInfo);
+     localStorage.setItem("website", JSON.stringify(userwebsites))
+     displayWebInfo(userwebsites.length-1);
+     dltRow()
+     clearInput();
 }else{
     Swal.fire({
         title: "Check Site Name and URL",
-    
       });
-
  }
 }
+
 
 
 function displayWebInfo(index){
@@ -50,9 +52,9 @@ function displayWebInfo(index){
     <tr>
                 <th>${index + 1}</th>
                 <th>${userwebsites[index].websiteName}</th>
-                <th><button type="button" class="btn btn-success"><a href="${userwebsites[index].websiteUrl}" class="text-white text-decoration-none"> Visit</a></button>
+                <th><button type="button" class="btn btn-success"><a href="${userwebsites[index].websiteUrl}" target="_blank" class="text-white text-decoration-none"> Visit</a></button>
                 </th>
-                <th><button type="button" class="btn btn-danger DeleteRow" onclick="deletewebsite(${index})">Delete</button>
+                <th><button type="button" class="btn btn-danger DeleteRow")">Delete</button>
                 </th>
     </tr>`
 
@@ -70,12 +72,12 @@ function clearInput(){
     siteUrl.value = "";
 }
 
-function deletewebsite(index){
-    userwebsites.splice(index,1);
-    localStorage.setItem("website", JSON.stringify(userwebsites));
-    webContainer.innerHTML="";
-    displayAllwebsite();
-}
+// function deletewebsite(index){
+//     userwebsites.splice(index,1);
+//     localStorage.setItem("website", JSON.stringify(userwebsites));
+//     webContainer.innerHTML="";
+//     displayAllwebsite();
+// }
 
 
 // function validName(){
@@ -113,18 +115,28 @@ function validData(regex, element){
 
 
 // Events
-// function dltRow(){
-//     for(var i=0; i<collectionHTML.length; i++){
-//         console.log(collectionHTML.item(i))
-//         collectionHTML.item(i).addEventListener("click", function(e){
-//             console.log("clicked");
-//             console.log(e);
-//             console.log(e.target);
-//             var clickedbtn = e.target;
-//             clickedbtn.parentElement.parentElement.remove();
-//         })
-// }
-// }
+function dltRow(){
+    for(var i=0; i<collectionHTML.length; i++){
+        console.log(collectionHTML.item(i))
+        collectionHTML.item(i).addEventListener("click", function(e){
+            console.log("clicked");
+            console.log(e);
+            console.log(e.target);
+            var clickedbtn = e.target;
+            var conText = clickedbtn.parentElement.previousElementSibling.previousElementSibling.innerText;
+            console.log(conText + " this is the  inner Text");
+            for (var i = 0; i< userwebsites.length; i++){
+                if(conText == userwebsites[i].websiteName){
+                    console.log(userwebsites[i].websiteName + " from array");
+                    userwebsites.splice(i,1);
+                    console.log("New Array " + userwebsites)
+                    localStorage.setItem("website", JSON.stringify(userwebsites));
+                }
+            }
+            clickedbtn.parentElement.parentElement.remove();
+        })
+}
+}
 
 
 
